@@ -46,6 +46,8 @@ void setup() {
   defaultColor = pixels.Color(0xFF,0xFF,0x0); //gelb
   
   pixels.begin();
+
+  clearAll();
 }
 
 void loop() {
