@@ -31,38 +31,53 @@
 #include <avr/power.h>
 #endif
 
-#define PIN         6   //Pin an welchem die LEDs angeschlossen sind
-#define NUMPIXELS   24  //Summe aller angeschlossenen LEDs
-#define COLPIXELS   12  //Anzahl der Spalten (LEDs welche gleichzeitig angesteuert werden)
+#define PIN               7   //Pin an welchem die LEDs angeschlossen sind
+#define NUMPIXELS         38  //Summe aller angeschlossenen LEDs
+#define COLPIXELS         19  //Anzahl der Spalten (LEDs welche gleichzeitig angesteuert werden)
 
-#define DIMCOLS     7   //Anzahl der Spalten welche gleichzeitig Leuchten (gedimmt)
-#define DELAY       150 //Umschaltzeit für jede Spalte
+#define DIMCOLSBEFORE     5  //Anzahl der Spalten welche vor der Position gedimmt werden
+#define DIMCOLSAFTER      3   //Anzahl der Spalten welche nach der Position gedimmt werden
+
+bool colMode = false;         //Spaltenmodus aktiviert, hierbei sind die Einzelnen Strips in Spalten angeordnet.
+int delayval = 150;           //Umschaltzeit für jede Spalte
+
+
+//Folgend muss keine Einstellung am Code mehr vorgenommen werden
 
 Adafruit_NeoPixel pixels = Adafruit_NeoPixel(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
 
-int delayval = DELAY;
 
 uint8_t rowPixels = 1;
 uint32_t defaultColor = 0;
-float dimFactor = 0;
+float dimFactorBefore = 0;
+float dimFactorAfter = 0;
 
-void setup() {
+void setup()
+{
   rowPixels = NUMPIXELS / COLPIXELS;
-  dimFactor = 100 / (DIMCOLS - 1) ;
+  dimFactorBefore = 100.0 / DIMCOLSBEFORE ;
+  dimFactorAfter = 100.0 / DIMCOLSAFTER;
   
-  defaultColor = pixels.Color(0xFF,0xF9,0x0); //gelb
+  defaultColor = pixels.Color(0xFF,0x60,0x05); //gelb
   
   pixels.begin();
 
   clearAll();
 }
 
-void loop() {
+
+void loop()
+{  
   for (int i = 0; i < COLPIXELS; i++)
   {
-    for (int z = 0; z < DIMCOLS; z++)
+    for (int z = 0; z < DIMCOLSBEFORE; z++)
     {
-      setColColor(i + z, dimColor(defaultColor, (uint8_t)(z * dimFactor)));
+      setColColor(i + z, dimColor(defaultColor, (uint8_t)(z * dimFactorBefore)));
+    }
+    
+    for (int z = 0; z < DIMCOLSAFTER; z++)
+    {
+      setColColor(DIMCOLSBEFORE + i + z, dimColor(defaultColor, (uint8_t)(100 - z * dimFactorAfter)));
     }
     pixels.show();
     delay(delayval);
@@ -73,12 +88,22 @@ void setColColor(uint8_t col, uint32_t color)
 {
   //Künstlicher Overflow per Modulo  0 .. (COLPIXELS - 1)
   uint8_t realCol = col % COLPIXELS;
-  
-  uint8_t firstPixel = realCol * rowPixels;
-  
-  for (int i = 0; i < rowPixels; i++)
+
+  if (colMode == true)
   {
-    pixels.setPixelColor(firstPixel + i, color); 
+    uint8_t firstPixel = realCol * rowPixels;
+  
+    for (int i = 0; i < rowPixels; i++)
+    {
+      pixels.setPixelColor(firstPixel + i, color); 
+    }
+  }
+  else
+  {
+    for (int i = 0; i < rowPixels; i++)
+    {
+      pixels.setPixelColor(realCol + (i * COLPIXELS), color); 
+    }
   }
 }
 
