@@ -31,19 +31,26 @@
 #include <avr/power.h>
 #endif
 
-#define PIN            6  //Pin an welchem die LEDs angeschlossen sind
-#define NUMPIXELS      24 //Summe aller angeschlossenen LEDs
-#define COLPIXELS      12 //Anzahl der Spalten (LEDs welche gleichzeitig angesteuert werden)
+#define PIN         6   //Pin an welchem die LEDs angeschlossen sind
+#define NUMPIXELS   24  //Summe aller angeschlossenen LEDs
+#define COLPIXELS   12  //Anzahl der Spalten (LEDs welche gleichzeitig angesteuert werden)
+
+#define DIMCOLS     7   //Anzahl der Spalten welche gleichzeitig Leuchten (gedimmt)
+#define DELAY       150 //Umschaltzeit für jede Spalte
 
 Adafruit_NeoPixel pixels = Adafruit_NeoPixel(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
 
-int delayval = 200;
+int delayval = DELAY;
+
 uint8_t rowPixels = 1;
 uint32_t defaultColor = 0;
+float dimFactor = 0;
 
 void setup() {
   rowPixels = NUMPIXELS / COLPIXELS;
-  defaultColor = pixels.Color(0xFF,0xFF,0x0); //gelb
+  dimFactor = 100 / (DIMCOLS - 1) ;
+  
+  defaultColor = pixels.Color(0xFF,0xF9,0x0); //gelb
   
   pixels.begin();
 
@@ -53,11 +60,10 @@ void setup() {
 void loop() {
   for (int i = 0; i < COLPIXELS; i++)
   {
-    setColColor(i, 0x000000);
-    setColColor(i + 1, dimColor(defaultColor, 20));
-    setColColor(i + 2, dimColor(defaultColor, 35));
-    setColColor(i + 3, dimColor(defaultColor, 70));
-    setColColor(i + 4, dimColor(defaultColor, 100));
+    for (int z = 0; z < DIMCOLS; z++)
+    {
+      setColColor(i + z, dimColor(defaultColor, (uint8_t)(z * dimFactor)));
+    }
     pixels.show();
     delay(delayval);
   }
