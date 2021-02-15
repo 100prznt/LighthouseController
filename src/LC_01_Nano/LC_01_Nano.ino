@@ -37,7 +37,7 @@
 
 Adafruit_NeoPixel pixels = Adafruit_NeoPixel(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
 
-int delayval = 500;
+int delayval = 200;
 uint8_t rowPixels = 1;
 uint32_t defaultColor = 0;
 
@@ -54,10 +54,10 @@ void loop() {
   for (int i = 0; i < COLPIXELS; i++)
   {
     setColColor(i, 0x000000);
-    setColColor(i + 1, dimColor(defaultColor, 4));
-    setColColor(i + 2, dimColor(defaultColor, 3));
-    setColColor(i + 3, dimColor(defaultColor, 2));
-    setColColor(i + 4, dimColor(defaultColor, 1));
+    setColColor(i + 1, dimColor(defaultColor, 20));
+    setColColor(i + 2, dimColor(defaultColor, 35));
+    setColColor(i + 3, dimColor(defaultColor, 70));
+    setColColor(i + 4, dimColor(defaultColor, 100));
     pixels.show();
     delay(delayval);
   }
@@ -65,16 +65,22 @@ void loop() {
 
 void setColColor(uint8_t col, uint32_t color)
 {
+  //Künstlicher Overflow per Modulo  0 .. (COLPIXELS - 1)
+  uint8_t realCol = col % COLPIXELS;
+  
+  uint8_t firstPixel = realCol * rowPixels;
+  
   for (int i = 0; i < rowPixels; i++)
   {
-    //Künstlicher Overflow per Modulo  0 .. (COLPIXELS - 1)
-    pixels.setPixelColor((col % COLPIXELS) + i + 1, color); //+1: Offset für NP-Lib, 1-basierend
+    pixels.setPixelColor(firstPixel + i, color); 
   }
 }
 
+// brightness: 0 .. 100 (dark .. bright)
 uint32_t dimColor(uint32_t color, uint8_t brightness)
 {
-   return (((color&0xFF0000)/brightness)&0xFF0000) + (((color&0x00FF00)/brightness)&0x00FF00) + (((color&0x0000FF)/brightness)&0x0000FF);
+  float scale = brightness / 100.0;
+  return ((uint32_t)((color&0xFF0000)*scale)&0xFF0000) + ((uint32_t)((color&0x00FF00)*scale)&0x00FF00) + ((uint32_t)((color&0x0000FF)*scale)&0x0000FF);
 }
 
 void clearAll()
