@@ -54,10 +54,10 @@ void loop() {
   for (int i = 0; i < COLPIXELS; i++)
   {
     setColColor(i, 0x000000);
-    setColColor(i + 1, dimColor(defaultColor, 32));
-    setColColor(i + 2, dimColor(defaultColor, 64));
-    setColColor(i + 3, dimColor(defaultColor, 128));
-    setColColor(i + 4, dimColor(defaultColor, 255));
+    setColColor(i + 1, dimColor(defaultColor, 4));
+    setColColor(i + 2, dimColor(defaultColor, 3));
+    setColColor(i + 3, dimColor(defaultColor, 2));
+    setColColor(i + 4, dimColor(defaultColor, 1));
     pixels.show();
     delay(delayval);
   }
@@ -68,7 +68,7 @@ void setColColor(uint8_t col, uint32_t color)
   for (int i = 0; i < rowPixels; i++)
   {
     //Künstlicher Overflow per Modulo  0 .. (COLPIXELS - 1)
-    pixels.setPixelColor((col % COLPIXELS) + i, color);
+    pixels.setPixelColor((col % COLPIXELS) + i + 1, color); //+1: Offset für NP-Lib, 1-basierend
   }
 }
 
