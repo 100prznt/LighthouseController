@@ -12,7 +12,7 @@ Angesteuert werden WS2812 LEDs welche in Spalten oder Zeilen angeordnet sind.
 ## Setup
 Im Programmcode können einige Einstellungen vorgenommen werden.
 
-´´´
+```
 //-----------------------------------------------------------------------------
 // ANFANG - Benutzereinstellungen
 //-----------------------------------------------------------------------------
@@ -31,4 +31,4 @@ int Rpm = 40;                 // "Umdrehungen" je Minute
 //-----------------------------------------------------------------------------
 // ENDE - Benutzereinstellungen
 //-----------------------------------------------------------------------------
-´´´
+```
