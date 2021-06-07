@@ -44,7 +44,7 @@
 #define DIMCOLSAFTER      5   // Anzahl der Spalten welche nach der Position gedimmt werden (Wert muss > 0 sein)
 
 bool ColMode = false;         // Spaltenmodus aktivieren, hierbei sind die Einzelnen Strips in Spalten angeordnet.
-int Rpm = 40;                 // "Umdrehungen" je Minute
+int Rpm = 60;                 // "Umdrehungen" je Minute
 
 //-----------------------------------------------------------------------------
 // ENDE - Benutzereinstellungen
